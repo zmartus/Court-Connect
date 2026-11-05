@@ -28,7 +28,6 @@ int main() {
     }
     //using the same seed (42) every time means everyone gets the exact same players
     mt19937 generator(42);
-    mt19937 generator(42);
 file << "playerID,skillLevel,latitude,longitude,availableDay,startMin,endMin,practiceType" << endl;
 //make 100,000 players, one each time through the loop
 for (int i = 1; i <= 100000; i++) {
