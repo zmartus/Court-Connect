@@ -48,7 +48,20 @@ static void test_parsing() {
     CHECK(parse_time("24:00") == INVALID_TIME);
     CHECK(parse_time("18:3") == INVALID_TIME);
     CHECK(parse_time("1830") == INVALID_TIME);
-    CHECK(format_time(18 * 60 + 5) == "18:05");
+    //am and pm work in any case, with or without a space or minutes
+    CHECK(parse_time("9:00 PM") == 21 * 60);
+    CHECK(parse_time("9:00pm") == 21 * 60);
+    CHECK(parse_time("9pm") == 21 * 60);
+    CHECK(parse_time("9:15 am") == 9 * 60 + 15);
+    CHECK(parse_time("12:00 AM") == 0);
+    CHECK(parse_time("12:30 PM") == 12 * 60 + 30);
+    CHECK(parse_time("13:00 PM") == INVALID_TIME);
+    CHECK(parse_time("0:30 AM") == INVALID_TIME);
+    CHECK(parse_time("pm") == INVALID_TIME);
+    CHECK(format_time(18 * 60 + 5) == "6:05 PM");
+    CHECK(format_time(0) == "12:00 AM");
+    CHECK(format_time(12 * 60) == "12:00 PM");
+    CHECK(format_time(23 * 60 + 59) == "11:59 PM");
     CHECK(day_name(0) == "Sun");
 }
 
@@ -109,6 +122,7 @@ static void test_menu_invalid_input_and_no_matches() {
     CHECK(output.find("Please enter a whole number from 1 to 3") != std::string::npos);
     CHECK(output.find("Please enter a whole number from 1 to 10") != std::string::npos);
     CHECK(output.find("at least 60 minutes") != std::string::npos);
+    CHECK(output.find("You entered 5:00 PM to 5:30 PM") != std::string::npos);
     CHECK(output.find("No players matched") != std::string::npos);
 }
 
