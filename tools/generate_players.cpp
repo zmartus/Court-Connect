@@ -10,11 +10,12 @@
 #include <string>
 
 using namespace std;
-
+//picks a random whole number between min_value and max_value
 int random_int(mt19937& generator, int min_value, int max_value) {
     int range = max_value - min_value + 1;
     return min_value + generator() % range;
 } 
+//picks a random decimal between -0.5 and 0.5 so players spread out around a city
 double random_offset(mt19937& generator) {
     int number = generator() % 1001;
     return number / 1000.0 - 0.5;
@@ -25,9 +26,11 @@ int main() {
         cout << "Could not open data/players.csv, make the data folder first" << endl;
         return 1;
     }
+    //using the same seed (42) every time means everyone gets the exact same players
+    mt19937 generator(42);
     mt19937 generator(42);
 file << "playerID,skillLevel,latitude,longitude,availableDay,startMin,endMin,practiceType" << endl;
-
+//make 100,000 players, one each time through the loop
 for (int i = 1; i <= 100000; i++) {
     Player player;
     player.playerID = i;
