@@ -60,24 +60,80 @@ double parse_double(const std::string& text, double min_value, double max_value)
 }
 
 int parse_time(const std::string& text) {
-    std::string trimmed = trim(text);
-    size_t colon = trimmed.find(':');
-    //there has to be an hour before the colon and exactly two digits after it
-    if (colon == std::string::npos || colon == 0 || colon + 3 != trimmed.size()) {
-        return INVALID_TIME;
+    //lowercase copy so "PM", "pm" and "Pm" all work the same
+    std::string time_text = trim(text);
+    for (size_t i = 0; i < time_text.size(); i++) {
+        time_text[i] = (char)std::tolower((unsigned char)time_text[i]);
     }
-    int hours = parse_int(trimmed.substr(0, colon), 0, 23);
-    int minutes = parse_int(trimmed.substr(colon + 1), 0, 59);
+
+    //if it ends in am or pm we read it as 12-hour time, otherwise 24-hour
+    bool twelve_hour = false;
+    bool is_pm = false;
+    if (time_text.size() >= 2) {
+        std::string ending = time_text.substr(time_text.size() - 2);
+        if (ending == "am" || ending == "pm") {
+            twelve_hour = true;
+            if (ending == "pm") {
+                is_pm = true;
+            }
+            time_text = trim(time_text.substr(0, time_text.size() - 2));
+        }
+    }
+
+    int max_hour = 23;
+    int min_hour = 0;
+    if (twelve_hour) {
+        max_hour = 12;
+        min_hour = 1;
+    }
+
+    int hours = INVALID_INT;
+    int minutes = 0;
+    size_t colon = time_text.find(':');
+    if (colon == std::string::npos) {
+        //no colon is only ok with am/pm, like "9pm"
+        if (!twelve_hour) {
+            return INVALID_TIME;
+        }
+        hours = parse_int(time_text, min_hour, max_hour);
+    } else {
+        //there has to be an hour before the colon and exactly two digits after it
+        if (colon == 0 || colon + 3 != time_text.size()) {
+            return INVALID_TIME;
+        }
+        hours = parse_int(time_text.substr(0, colon), min_hour, max_hour);
+        minutes = parse_int(time_text.substr(colon + 1), 0, 59);
+    }
     if (hours == INVALID_INT || minutes == INVALID_INT) {
         return INVALID_TIME;
+    }
+
+    if (twelve_hour) {
+        //12 am is midnight and 12 pm is noon, so 12 goes back to 0 before adding the pm hours
+        if (hours == 12) {
+            hours = 0;
+        }
+        if (is_pm) {
+            hours = hours + 12;
+        }
     }
     return hours * 60 + minutes;
 }
 
 std::string format_time(int minutes) {
-    //6 chars is enough for "HH:MM" plus the null at the end
-    char buffer[6];
-    std::snprintf(buffer, sizeof(buffer), "%02d:%02d", (minutes / 60) % 24, minutes % 60);
+    int hours = (minutes / 60) % 24;
+    std::string suffix = "AM";
+    if (hours >= 12) {
+        suffix = "PM";
+    }
+    //a 12-hour clock goes 12, 1, 2 ... 11, so both 0 and 12 show up as 12
+    int clock_hour = hours % 12;
+    if (clock_hour == 0) {
+        clock_hour = 12;
+    }
+    //9 chars is enough for "12:00 PM" plus the null at the end
+    char buffer[9];
+    std::snprintf(buffer, sizeof(buffer), "%d:%02d %s", clock_hour, minutes % 60, suffix.c_str());
     return buffer;
 }
 

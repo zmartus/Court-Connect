@@ -22,10 +22,11 @@ int parse_int(const std::string& text, int min_value, int max_value);
 //same idea as parse_int but for decimals, gives back nan when the input is bad (check with std::isnan)
 double parse_double(const std::string& text, double min_value, double max_value);
 
-//turns "18:30" or "6:05" into minutes after midnight (hours 0-23, minutes 0-59)
+//turns "6:30 PM", "6pm" or "18:30" into minutes after midnight
+//without am/pm it's read as 24-hour time (hours 0-23)
 int parse_time(const std::string& text);
 
-//goes the other way, so 1110 becomes "18:30"
+//goes the other way, so 1110 becomes "6:30 PM"
 std::string format_time(int minutes);
 
 //0 is "Sun", 1 is "Mon", and so on

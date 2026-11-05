@@ -66,7 +66,7 @@ static int ask_time(std::istream& in, std::ostream& out, const std::string& prom
         if (value != INVALID_TIME) {
             return value;
         }
-        out << "  Please use 24-hour HH:MM, like 18:30.\n";
+        out << "  Please enter a time like 6:30 PM, 6pm or 18:30.\n";
     }
 }
 
@@ -120,18 +120,20 @@ static SearchQuery search_form(std::istream& in, std::ostream& out) {
 
     //keep asking until the window is at least an hour long and actually ends after it starts
     while (true) {
-        query.startMin = ask_time(in, out, "Free from (HH:MM): ");
+        query.startMin = ask_time(in, out, "Free from (like 5:00 PM): ");
         if (input_closed) {
             return query;
         }
-        query.endMin = ask_time(in, out, "Free until (HH:MM): ");
+        query.endMin = ask_time(in, out, "Free until (like 7:00 PM): ");
         if (input_closed) {
             return query;
         }
         if (query.endMin - query.startMin >= 60) {
             break;
         }
-        out << "  Your window must be at least 60 minutes, ending after it starts.\n";
+        //show what we read so it's obvious if they meant PM instead of AM
+        out << "  You entered " << format_time(query.startMin) << " to " << format_time(query.endMin)
+            << ". Your window must be at least 60 minutes, ending after it starts.\n";
     }
 
     out << "Practice activity:\n";
@@ -164,9 +166,9 @@ static void show_results(std::ostream& out, const std::vector<Candidate>& ranked
 
     out << ranked.size() << " players matched. Top " << shown_count << ":\n\n";
     out << std::left << std::setw(6) << "Rank" << std::setw(10) << "Player" << std::setw(7) << "Skill"
-        << std::setw(11) << "Distance" << std::setw(18) << "Available" << std::setw(10) << "Overlap"
+        << std::setw(11) << "Distance" << std::setw(24) << "Available" << std::setw(10) << "Overlap"
         << "Score\n";
-    out << std::string(68, '-') << "\n";
+    out << std::string(74, '-') << "\n";
 
     for (size_t i = 0; i < shown_count; i++) {
         const Candidate& candidate = ranked[i];
@@ -178,7 +180,7 @@ static void show_results(std::ostream& out, const std::vector<Candidate>& ranked
 
         out << std::left << std::setw(6) << i + 1 << std::setw(10) << candidate.player.playerID
             << std::setw(7) << candidate.player.skillLevel << std::setw(11) << miles.str()
-            << std::setw(18) << available << std::setw(10)
+            << std::setw(24) << available << std::setw(10)
             << (std::to_string(candidate.overlapMinutes) + " min") << std::fixed << std::setprecision(3)
             << candidate.score << "\n";
     }
