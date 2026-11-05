@@ -21,3 +21,6 @@ target_link_libraries(court_connect_tests court_core)
 
 add_executable(generate_players tools/generate_players.cpp)
 target_include_directories(generate_players PRIVATE include)
+
+add_executable(zachery_tests tests/test_zachery.cpp)
+target_link_libraries(zachery_tests court_core)
