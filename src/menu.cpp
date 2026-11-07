@@ -1,4 +1,4 @@
-//menu.cpp
+    //menu.cpp
 //OWNER: Zachary Martus
 
 #include "menu.h"
@@ -128,12 +128,20 @@ static SearchQuery search_form(std::istream& in, std::ostream& out) {
         if (input_closed) {
             return query;
         }
-        if (query.endMin - query.startMin >= 60) {
-            break;
+        if (query.endMin <= query.startMin && query.startMin >= 12 * 60 && query.endMin < 12 * 60) {
+            query.endMin += 12 * 60;
         }
-        //show what we read so it's obvious if they meant PM instead of AM
-        out << "  You entered " << format_time(query.startMin) << " to " << format_time(query.endMin)
-            << ". Your window must be at least 60 minutes, ending after it starts.\n";
+        if (query.endMin <= query.startMin) {
+            out << "  You entered " << format_time(query.startMin) << " to " << format_time(query.endMin)
+                << ". Your end time must be after your start time (add AM or PM to be sure).\n";
+            continue;
+        }
+        if (query.endMin - query.startMin < 60) {
+            out << "  You entered " << format_time(query.startMin) << " to " << format_time(query.endMin)
+                << ". Your window must be at least 60 minutes long.\n";
+            continue;
+        }
+        break;
     }
 
     out << "Practice activity:\n";
