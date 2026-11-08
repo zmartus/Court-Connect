@@ -21,3 +21,12 @@ target_link_libraries(court_connect_tests court_core)
 
 add_executable(generate_players tools/generate_players.cpp)
 target_include_directories(generate_players PRIVATE include)
+
+# web demo: ./build/court_connect_web, then open http://localhost:8080
+find_package(Threads REQUIRED)
+add_executable(court_connect_web src/web_main.cpp)
+target_include_directories(court_connect_web PRIVATE third_party)
+target_link_libraries(court_connect_web court_core Threads::Threads)
+if(WIN32)
+  target_link_libraries(court_connect_web ws2_32)
+endif()
