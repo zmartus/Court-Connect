@@ -1,4 +1,4 @@
-    //menu.cpp
+//menu.cpp
 //OWNER: Zachary Martus
 
 #include "menu.h"
