@@ -177,4 +177,4 @@ Court-Connect/
 - [cppreference](https://en.cppreference.com), the C++ standard library reference
 - [MDN Web Docs](https://developer.mozilla.org), the HTML, CSS and JavaScript reference
 - [Cloudflare Quick Tunnels](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/), used for sharing the demo
-- Web demo (`web_main.cpp`, `web/index.html`) built with help from Claude (Anthropic)
+- Web demo (`web_main.cpp`, `web/index.html`) built with https://github.com/yhirose/cpp-httplib
